@@ -698,8 +698,16 @@ amf.Reader.prototype.readTraits = function(ref) {
             traits[amf.CONST.CLASS_ALIAS] = className;
         }
         traits.props = [];
-        for (var i = 0; i < count; i++) {
-            traits.props.push(this.readString());
+        if ((ref & 7) == 7) {
+            if (className == 'flex.messaging.io.ArrayCollection'){
+                traits.props.push("source");
+            }else{
+                throw "Unsupported external object: " + className;
+            }
+        }else{
+            for (var i = 0; i < count; i++) {
+                traits.props.push(this.readString());
+            }
         }
         this.rememberTraits(traits);
         return traits;
@@ -720,7 +728,7 @@ amf.Reader.prototype.readScriptObject = function() {
         for (var i in traits.props) {
             obj[traits.props[i]] = this.readObject();
         }
-        if ((ref & 8) == 8) {//dynamic
+        if ((ref & 14) == 14) {//dynamic
             for (; ;) {
                 var name = this.readString();
                 if (name == null || name.length == 0)
