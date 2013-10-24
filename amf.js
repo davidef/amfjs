@@ -130,6 +130,7 @@ var amf = {
             message.source = source;
             message.operation = operation;
             message.body = params;
+            message.messageId = amf.uuid(0,0);
             //message.headers['DSId'] = this.clientId;
             message.clientId = this.clientId;
 
