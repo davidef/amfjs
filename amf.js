@@ -728,7 +728,7 @@ amf.Reader.prototype.readScriptObject = function() {
         for (var i in traits.props) {
             obj[traits.props[i]] = this.readObject();
         }
-        if ((ref & 14) == 14) {//dynamic
+        if ((ref & 11) == 11) {//dynamic
             for (; ;) {
                 var name = this.readString();
                 if (name == null || name.length == 0)
