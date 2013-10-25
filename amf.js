@@ -38,6 +38,7 @@ var amf = {
     endpoint: "",
     headers: null,
     doNothing: new Function,
+    classRegistry: {},
 
     init: function(destination, endpoint, timeout) {
         this.clientId = null;
@@ -46,6 +47,10 @@ var amf = {
         this.endpoint = endpoint;
         this.requestTimeout = timeout ? timeout : 30000; //30 seconds
         this.headers = [];
+    },
+
+    registerClass: function(name, clazz) {
+        this.classRegistry[name] = clazz;
     },
 
     addHeader: function(name, value) {
@@ -722,6 +727,11 @@ amf.Reader.prototype.readScriptObject = function() {
         var traits = this.readTraits(ref);
         var obj = {};
         if (amf.CONST.CLASS_ALIAS in traits) {
+            var clazzName = traits[amf.CONST.CLASS_ALIAS];
+            var contructor = amf.classRegistry[clazzName];
+            if (contructor){
+                obj = new contructor();
+            }
             obj[amf.CONST.CLASS_ALIAS] = traits[amf.CONST.CLASS_ALIAS];
         }
         this.rememberObject(obj);
