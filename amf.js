@@ -730,8 +730,8 @@ amf.Reader.prototype.readScriptObject = function() {
             obj[amf.CONST.CLASS_ALIAS] = traits[amf.CONST.CLASS_ALIAS];
         }
         this.rememberObject(obj);
-        if ((ref & 4) == 4 && obj[amf.CONST.CLASS_ALIAS] == "flex.messaging.io.ArrayCollection") {//externalizable
-            if (obj[amf.CONST.CLASS_ALIAS] == "flex.messaging.io.ArrayCollection") {//externalizable
+        if ((ref & 4) == 4) {//externalizable
+            if (obj[amf.CONST.CLASS_ALIAS] == "flex.messaging.io.ArrayCollection") {
             	obj.source = this.readObject();
         	}else{
         		throw "Unsupported external object: " + className;
