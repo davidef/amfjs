@@ -734,7 +734,7 @@ amf.Reader.prototype.readScriptObject = function() {
             if (obj[amf.CONST.CLASS_ALIAS] == "flex.messaging.io.ArrayCollection") {
             	obj.source = this.readObject();
         	}else{
-        		throw "Unsupported external object: " + className;
+        		throw "Unsupported external object: " + obj[amf.CONST.CLASS_ALIAS];
         	}
         } else {
             for (var i in traits.props) {
