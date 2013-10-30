@@ -36,16 +36,14 @@ var amf = {
     sendMessageId: false,
     clientId: null,
     sequence: 1,
-    destination: "",
     endpoint: "",
     headers: null,
     doNothing: new Function,
     classRegistry: {},
 
-    init: function(destination, endpoint, timeout) {
+    init: function(endpoint, timeout) {
         this.clientId = null;
         this.sequence = 1;
-        this.destination = destination;
         this.endpoint = endpoint;
         this.requestTimeout = timeout ? timeout : 30000; //30 seconds
         this.headers = [];
@@ -121,7 +119,7 @@ var amf = {
         }
     },
     
-    createMessage: function(source, operation, params) {
+    createMessage: function(destination, source, operation, params) {
         var actionMessage = new amf.ActionMessage();
         var messageBody = new amf.MessageBody();
         var message;
@@ -129,11 +127,11 @@ var amf = {
             this.sequence = 1;
             messageBody.responseURI = "/" + this.sequence++;
             message = new amf.CommandMessage();
-            message.destination = this.destination;
+            message.destination = destination;
         } else {
             messageBody.responseURI = "/" + this.sequence++;
             message = new amf.RemotingMessage();
-            message.destination = this.destination;
+            message.destination = destination;
             message.source = source;
             message.operation = operation;
             message.body = params;
@@ -156,12 +154,12 @@ var amf = {
         return actionMessage;
     },
 
-    invoke: function(source, operation, params, onResult, onStatus) {
+    invoke: function(destination, source, operation, params, onResult, onStatus) {
         if (this.clientId == null && this.messageQueue.length == 0) {
-            this.messageQueue.push([this.createMessage("ping"), onResult, onStatus]);
+            this.messageQueue.push([this.createMessage(destination, "ping"), onResult, onStatus]);
             this._processQueue();
         }
-        this.messageQueue.push([this.createMessage(source, operation, params), onResult, onStatus]);
+        this.messageQueue.push([this.createMessage(destination, source, operation, params), onResult, onStatus]);
         if (this.clientId != null) {
             this._processQueue();
         }
