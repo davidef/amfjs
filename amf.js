@@ -26,7 +26,8 @@ var amf = {
         UINT29_MASK : 536870911,
         INT28_MAX_VALUE : 268435455,
         INT28_MIN_VALUE : -268435456,
-        CLASS_ALIAS : "_explicitType"
+        CLASS_ALIAS : "_explicitType",
+        EXTERNALIZABLE : "_isExternalizable"
     },
     requestTimeout: 30000, //30 seconds
     requestPoolSize: 6,
@@ -705,6 +706,7 @@ amf.Reader.prototype.readTraits = function(ref) {
         if (className != null && className != "") {
             traits[amf.CONST.CLASS_ALIAS] = className;
         }
+        traits[amf.CONST.EXTERNALIZABLE] = ((ref & 4) == 4);
         traits.props = [];
         for (var i = 0; i < count; i++) {
             traits.props.push(this.readString());
@@ -730,9 +732,11 @@ amf.Reader.prototype.readScriptObject = function() {
             obj[amf.CONST.CLASS_ALIAS] = traits[amf.CONST.CLASS_ALIAS];
         }
         this.rememberObject(obj);
-        if ((ref & 4) == 4) {//externalizable
+        if (traits[amf.CONST.EXTERNALIZABLE]) {//externalizable
             if (obj[amf.CONST.CLASS_ALIAS] == "flex.messaging.io.ArrayCollection") {
             	obj.source = this.readObject();
+            }else if (obj[amf.CONST.CLASS_ALIAS] == "java.lang.Class") {
+                obj.clazz = this.readObject();
         	}else{
         		throw "Unsupported external object: " + obj[amf.CONST.CLASS_ALIAS];
         	}
@@ -740,7 +744,7 @@ amf.Reader.prototype.readScriptObject = function() {
             for (var i in traits.props) {
                 obj[traits.props[i]] = this.readObject();
             }
-            if ((ref & 8) == 8) {//dynamic
+            if ((ref & 11) == 11) {//dynamic
                 for (; ;) {
                     var name = this.readString();
                     if (name == null || name.length == 0) {
